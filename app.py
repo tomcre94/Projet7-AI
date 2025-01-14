@@ -7,62 +7,60 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 import nltk
-import logging
-
-# Configuration du logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Télécharger les ressources NLTK nécessaires
+# Télécharger les ressources NLTK
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Initialiser les outils de prétraitement
 stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
-# Charger le modèle avec plus de détails sur les erreurs
+# Charger le modèle compatible
 try:
-    logger.info("Tentative de chargement du modèle...")
-    logger.info(f"Répertoire courant : {os.getcwd()}")
-    logger.info(f"Contenu du répertoire : {os.listdir()}")
-
-    if os.path.exists('model_lstm.h5'):
-        logger.info("Le fichier model_lstm.h5 existe")
-        model = tf.keras.models.load_model('model_lstm.h5')
-        logger.info("Modèle chargé avec succès")
-    else:
-        logger.error("Le fichier model_lstm.h5 n'existe pas dans le répertoire")
-        model = None
+    model = tf.keras.models.load_model('model_lstm_compatible.h5')
+    print("Modèle chargé avec succès")
 except Exception as e:
-    logger.error(f"Erreur lors du chargement du modèle: {str(e)}")
+    print(f"Erreur lors du chargement du modèle: {str(e)}")
     model = None
 
 
-# Reste de votre code...
-# [Le reste du code reste identique jusqu'à la route predict]
+def clean_text(text):
+    # Votre fonction clean_text existante reste la même
+    text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
+    text = re.sub(r'\@\w+', 'mention', text)
+    text = re.sub(r'\#\w+', 'hashtag', text)
+    text = re.sub(r'[^A-Za-z\s]', '', text)
+    text = text.lower()
+    tokens = word_tokenize(text)
+    tokens = [word for word in tokens if word not in stop_words and word.isalpha()]
+    tokens = [stemmer.stem(word) for word in tokens]
+    tokens = [lemmatizer.lemmatize(word) for word in tokens]
+    return tokens
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         if model is None:
-            logger.error("Tentative de prédiction avec un modèle non chargé")
             return jsonify({
                 'status': 'error',
-                'message': 'Le modèle n\'est pas chargé correctement. Vérifiez les logs pour plus de détails.'
+                'message': 'Le modèle n\'est pas chargé correctement'
             })
 
         tweet = request.form['tweet']
-        logger.info(f"Tweet reçu : {tweet}")
-
         processed_tweet = clean_text(tweet)
         processed_tweet = ' '.join(processed_tweet)
-        logger.info(f"Tweet traité : {processed_tweet}")
 
+        # Faire la prédiction
         input_data = np.array([processed_tweet])
         prediction = model.predict(input_data)
 
@@ -77,7 +75,6 @@ def predict():
             'processed_tweet': processed_tweet
         })
     except Exception as e:
-        logger.error(f"Erreur lors de la prédiction : {str(e)}")
         return jsonify({
             'status': 'error',
             'message': str(e)
