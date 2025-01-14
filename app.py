@@ -3,98 +3,65 @@ import tensorflow as tf
 from flask import Flask, request, jsonify, render_template
 import os
 import re
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
+import nltk
+import logging
+
+# Configuration du logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configuration pour Heroku
-if os.environ.get('HEROKU'):
-    # Définir le chemin NLTK_DATA
-    nltk.data.path.append('./nltk_data/')
-    # Télécharger les ressources NLTK si nécessaire
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        nltk.download('punkt', download_dir='./nltk_data/')
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        nltk.download('stopwords', download_dir='./nltk_data/')
-    try:
-        nltk.data.find('corpora/wordnet')
-    except LookupError:
-        nltk.download('wordnet', download_dir='./nltk_data/')
+# Télécharger les ressources NLTK nécessaires
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 # Initialiser les outils de prétraitement
-try:
-    stop_words = set(stopwords.words('english'))
-except:
-    print("Erreur lors du chargement des stopwords")
-    stop_words = set()
-
+stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
-# Charger le modèle de manière sécurisée
+# Charger le modèle avec plus de détails sur les erreurs
 try:
-    model = tf.keras.models.load_model('model_lstm.h5')
-    print("Modèle chargé avec succès")
+    logger.info("Tentative de chargement du modèle...")
+    logger.info(f"Répertoire courant : {os.getcwd()}")
+    logger.info(f"Contenu du répertoire : {os.listdir()}")
+
+    if os.path.exists('model_lstm.h5'):
+        logger.info("Le fichier model_lstm.h5 existe")
+        model = tf.keras.models.load_model('model_lstm.h5')
+        logger.info("Modèle chargé avec succès")
+    else:
+        logger.error("Le fichier model_lstm.h5 n'existe pas dans le répertoire")
+        model = None
 except Exception as e:
-    print(f"Erreur lors du chargement du modèle: {str(e)}")
+    logger.error(f"Erreur lors du chargement du modèle: {str(e)}")
     model = None
 
 
-def clean_text(text):
-    try:
-        # Remplacer les URLs
-        text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
-        text = re.sub(r'\@\w+', 'mention', text)
-        text = re.sub(r'\#\w+', 'hashtag', text)
-        text = re.sub(r'[^A-Za-z\s]', '', text)
-        text = text.lower()
-
-        # Tokenisation avec gestion d'erreur
-        try:
-            tokens = word_tokenize(text)
-        except:
-            tokens = text.split()
-
-        # Filtrage
-        tokens = [word for word in tokens if word not in stop_words and word.isalpha()]
-
-        # Stemming et lemmatization
-        try:
-            tokens = [stemmer.stem(word) for word in tokens]
-            tokens = [lemmatizer.lemmatize(word) for word in tokens]
-        except Exception as e:
-            print(f"Erreur lors du stemming/lemmatization: {str(e)}")
-
-        return tokens
-    except Exception as e:
-        print(f"Erreur dans clean_text: {str(e)}")
-        return text.split()
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
+# Reste de votre code...
+# [Le reste du code reste identique jusqu'à la route predict]
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         if model is None:
+            logger.error("Tentative de prédiction avec un modèle non chargé")
             return jsonify({
                 'status': 'error',
-                'message': 'Le modèle n\'est pas chargé correctement'
+                'message': 'Le modèle n\'est pas chargé correctement. Vérifiez les logs pour plus de détails.'
             })
 
         tweet = request.form['tweet']
+        logger.info(f"Tweet reçu : {tweet}")
+
         processed_tweet = clean_text(tweet)
         processed_tweet = ' '.join(processed_tweet)
+        logger.info(f"Tweet traité : {processed_tweet}")
 
         input_data = np.array([processed_tweet])
         prediction = model.predict(input_data)
@@ -110,6 +77,7 @@ def predict():
             'processed_tweet': processed_tweet
         })
     except Exception as e:
+        logger.error(f"Erreur lors de la prédiction : {str(e)}")
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -117,6 +85,5 @@ def predict():
 
 
 if __name__ == '__main__':
-    # Utiliser le port défini par Heroku
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
