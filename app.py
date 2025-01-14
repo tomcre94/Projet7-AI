@@ -7,6 +7,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 import nltk
+from tensorflow.keras.utils import custom_object_scope
 
 app = Flask(__name__)
 
@@ -21,15 +22,14 @@ lemmatizer = WordNetLemmatizer()
 
 # Charger le modèle compatible
 try:
-    model = tf.keras.models.load_model('model_lstm_compatible.h5')
+    with custom_object_scope({'DTypePolicy': tf.keras.mixed_precision.Policy}):
+        model = tf.keras.models.load_model('model_lstm_compatible.h5')
     print("Modèle chargé avec succès")
 except Exception as e:
     print(f"Erreur lors du chargement du modèle: {str(e)}")
     model = None
 
-
 def clean_text(text):
-    # Votre fonction clean_text existante reste la même
     text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
     text = re.sub(r'\@\w+', 'mention', text)
     text = re.sub(r'\#\w+', 'hashtag', text)
@@ -41,11 +41,9 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
-
 @app.route('/')
 def home():
     return render_template('index.html')
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -79,7 +77,6 @@ def predict():
             'status': 'error',
             'message': str(e)
         })
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
