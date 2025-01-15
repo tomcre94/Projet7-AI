@@ -1,13 +1,12 @@
 import numpy as np
 import tensorflow as tf
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import os
 import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 import nltk
-from tensorflow.keras.utils import custom_object_scope
 
 app = Flask(__name__)
 
@@ -22,8 +21,7 @@ lemmatizer = WordNetLemmatizer()
 
 # Charger le modèle compatible
 try:
-    with custom_object_scope({'DTypePolicy': tf.keras.mixed_precision.Policy}):
-        model = tf.keras.models.load_model('model_lstm_compatible.h5')
+    model = tf.keras.models.load_model('model_lstm_compatible.h5')
     print("Modèle chargé avec succès")
 except Exception as e:
     print(f"Erreur lors du chargement du modèle: {str(e)}")
@@ -40,10 +38,6 @@ def clean_text(text):
     tokens = [stemmer.stem(word) for word in tokens]
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
-
-@app.route('/')
-def home():
-    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
