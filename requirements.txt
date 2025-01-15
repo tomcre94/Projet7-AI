@@ -1,3 +1,8 @@
 Flask
 tensorflow
 nltk
+transformers
+torch
+azure-identity
+azure-ai-ml
+gunicorn
