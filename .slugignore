@@ -1,0 +1,15 @@
+/mlruns
+/myenv
+/templates
+Creuse_Tom_2_scripts_notebook_modélisation_122024.ipynb
+Prise de notes début.odt
+soutenance.odt
+Dataset_Init.csv
+glove.6B.100d.txt
+glove.6B.100d.word2vec.txt
+local_app.py
+model_lstm.h5
+nltk.txt
+*.odt
+runtime.txt
+
