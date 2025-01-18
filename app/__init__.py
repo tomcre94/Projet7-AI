@@ -1,6 +1,7 @@
 # __init__.py
 from flask import Flask
 from keras.models import load_model
+from keras.preprocessing.sequence import pad_sequences
 import os
 
 app = Flask(__name__)
@@ -9,13 +10,12 @@ app = Flask(__name__)
 model_path = os.path.join(os.path.dirname(__file__), 'model_lstm_compatible.h5')
 model = load_model(model_path)
 
-from app import routes
+from . import routes
 
 # main.py
 from flask import request, jsonify
 import numpy as np
-from app import app, model
-from keras.preprocessing.sequence import pad_sequences
+from . import app, model
 import pickle
 import os
 
