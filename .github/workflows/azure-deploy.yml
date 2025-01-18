@@ -7,8 +7,8 @@ on:
       - main
 
 env:
-  AZURE_WEBAPP_NAME: sentiment-analysis-app    # Remplacez par le nom de votre webapp
-  PYTHON_VERSION: '3.8'
+  AZURE_WEBAPP_NAME: projet7-deeplearning
+  PYTHON_VERSION: '3.12.8'
 
 jobs:
   build-and-deploy:
