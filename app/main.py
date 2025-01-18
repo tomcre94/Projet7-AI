@@ -24,6 +24,8 @@ model = tf.keras.models.load_model('model_lstm_compatible.h5')
 with open('tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
 
+# Dictionnaire temporaire pour stocker la prédiction associée à un tweet
+prediction_cache = {}
 
 def clean_text(text):
     text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
@@ -81,6 +83,18 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/feedbackpositif', methods=['POST'])
+def feedbackpositif():
+    return "true"
+
+@app.route('/feedbacknegatif', methods=['POST'])
+def feedbacknegatif():
+    data = request.get_json()
+    tweet_text = data.get('text')
+
+    app.logger.error(f'{tweet_text}: {prediction_cache[tweet_text]}')
+
+    return "true"
 
 if __name__ == '__main__':
     # Download required NLTK data
