@@ -25,7 +25,7 @@ def main():
     # Configuration de l'API
     api_url = st.sidebar.text_input(
         "URL de l'API",
-        value="https://<your-app-name>.azurewebsites.net/predict",
+        value="https://projet7-deeplearning-e9hafvfabugpe0c3.francecentral-01.azurewebsites.net/predict",
         key="api_url"
     )
 
