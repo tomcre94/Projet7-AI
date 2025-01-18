@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+from pandas import Timestamp
 import json
 
 
@@ -24,7 +25,7 @@ def main():
     # Configuration de l'API
     api_url = st.sidebar.text_input(
         "URL de l'API",
-        value="https://projet7-deeplearning.azurewebsites.net/predict",
+        value="https://<your-app-name>.azurewebsites.net/predict",
         key="api_url"
     )
 
@@ -45,14 +46,14 @@ def main():
 
                     with col1:
                         sentiment = result.get('sentiment', 'inconnu')
-                        score = result.get('score', 0)
+                        score = result.get('confidence', 0)
 
                         if sentiment == "positif":
                             st.success(f"Sentiment : {sentiment}")
                         else:
                             st.error(f"Sentiment : {sentiment}")
 
-                        st.metric("Score", f"{score:.2%}")
+                        st.metric("Confiance", f"{confidence:.2%}")
 
                     with col2:
                         # Feedback
