@@ -14,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name : Checkout code
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -28,7 +29,7 @@ jobs:
 
     - name: Create deployment package
       run: |
-        zip -r deployment.zip . -x "*.git*"
+        zip -r deployment.zip app/ requirements.txt runtime.txt Procfile
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
@@ -36,9 +37,6 @@ jobs:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: deployment.zip
-        type: zip
-        restart: true
-        clean: true
 
     - name: Clean up deployment package
       if: always()
