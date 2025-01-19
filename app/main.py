@@ -94,13 +94,19 @@ def feedbackpositif():
 @app.route('/feedbacknegatif', methods=['POST'])
 def feedbacknegatif():
     data = request.get_json()
-    tweet_text = data.get('text')
+    tweet_text = data.get('text', 'Texte inconnu')
 
-    app.logger.error(f'{tweet_text}: {prediction_cache[tweet_text]}')
+    # Sauvegarde dans un fichier
+    with open(os.path.join(BASE_DIR, 'feedback_negatif.txt'), 'a') as file:
+        file.write(f'{tweet_text}: {prediction_cache.get(tweet_text, "Non prédit")}\n')
 
-    return "true"
+    return jsonify({'status': 'Feedback enregistré'}), 200
 
-if __name__ == '__main__':
+import logging
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
     # Download required NLTK data
     import nltk
 
