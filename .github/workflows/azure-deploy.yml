@@ -26,9 +26,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install --no-cache-dir -r requirements.txt
 
+    - name: Create deployment package
+      run: |
+        zip -r deployment.zip . -x "*.git*"
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ./app
+        package: deployment.zip
+        type: zip
+        restart: true
+        clean: true
+
+    - name: Clean up deployment package
+      if: always()
+      run: |
+       rm -f deployment.zip
