@@ -17,11 +17,15 @@ stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Charger le modèle
-model = tf.keras.models.load_model('model_lstm_compatible.h5')
+model_path = os.path.join(BASE_DIR, 'model_lstm_compatible.h5')
+model = tf.keras.models.load_model(model_path)
 
 # Charger le tokenizer
-with open('tokenizer.pickle', 'rb') as handle:
+tokenizer_path = os.path.join(BASE_DIR, 'tokenizer.pickle')
+with open(tokenizer_path, 'rb') as handle:
     tokenizer = pickle.load(handle)
 
 # Dictionnaire temporaire pour stocker la prédiction associée à un tweet
