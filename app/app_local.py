@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import json
 
+
 def analyze_sentiment(text, api_url):
     try:
         response = requests.post(
@@ -14,10 +15,12 @@ def analyze_sentiment(text, api_url):
     except requests.exceptions.RequestException as e:
         return {"error": f"Erreur de connexion: {str(e)}"}
 
+
 def main():
     st.set_page_config(page_title="Analyseur de Sentiments", page_icon="🎭")
 
     st.title("🎭 Analyseur de Sentiments de Tweets")
+
 
     # Configuration de l'API
     api_url = st.sidebar.text_input(
@@ -26,8 +29,10 @@ def main():
         key="api_url"
     )
 
+
     # Zone de texte pour le tweet
     tweet = st.text_area("Entrez votre tweet :", height=100)
+
 
     # Bouton d'analyse
     if st.button("Analyser le sentiment"):
@@ -38,6 +43,7 @@ def main():
                 if "error" in result:
                     st.error(f"Erreur : {result['error']}")
                 else:
+
                     # Affichage du résultat
                     col1, col2 = st.columns(2)
 
@@ -53,12 +59,14 @@ def main():
                         st.metric("Confiance", f"{score:.2%}")
 
                     with col2:
+
                         # Feedback
                         st.write("Le résultat est-il correct ?")
                         col_yes, col_no = st.columns(2)
 
                         with col_yes:
                             if st.button("✅ Oui"):
+
                                 # Sauvegarder le feedback positif
                                 feedback = {
                                     'tweet': tweet,
@@ -72,6 +80,7 @@ def main():
 
                         with col_no:
                             if st.button("❌ Non"):
+
                                 # Sauvegarder le feedback négatif
                                 feedback = {
                                     'tweet': tweet,
@@ -85,6 +94,7 @@ def main():
         else:
             st.warning("Veuillez entrer un tweet à analyser.")
 
+
     # Exportation des feedbacks
     if 'feedback_data' in st.session_state and st.session_state.feedback_data:
         if st.button("Télécharger les feedbacks"):
@@ -96,6 +106,7 @@ def main():
                 file_name="sentiment_feedback.csv",
                 mime="text/csv"
             )
+
 
 if __name__ == "__main__":
     main()
