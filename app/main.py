@@ -1,4 +1,3 @@
-# main.py
 from flask import Flask, request, jsonify
 import tensorflow as tf
 import numpy as np
@@ -43,11 +42,9 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
-
 @app.route('/')
 def home():
     return "API d'analyse de sentiments en ligne"
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -102,7 +99,6 @@ def feedbacknegatif():
 
     return jsonify({'status': 'Feedback enregistré'}), 200
 
-import os
 import subprocess
 
 # Download NLTK data

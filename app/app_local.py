@@ -1,9 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
-from pandas import Timestamp
 import json
-
 
 def analyze_sentiment(text, api_url):
     try:
@@ -15,7 +13,6 @@ def analyze_sentiment(text, api_url):
         return response.json()
     except requests.exceptions.RequestException as e:
         return {"error": f"Erreur de connexion: {str(e)}"}
-
 
 def main():
     st.set_page_config(page_title="Analyseur de Sentiments", page_icon="🎭")
@@ -46,14 +43,14 @@ def main():
 
                     with col1:
                         sentiment = result.get('sentiment', 'inconnu')
-                        score = result.get('confidence', 0)
+                        score = result.get('score', 0)
 
                         if sentiment == "positif":
                             st.success(f"Sentiment : {sentiment}")
                         else:
                             st.error(f"Sentiment : {sentiment}")
 
-                        st.metric("Confiance", f"{confidence:.2%}")
+                        st.metric("Confiance", f"{score:.2%}")
 
                     with col2:
                         # Feedback
@@ -99,7 +96,6 @@ def main():
                 file_name="sentiment_feedback.csv",
                 mime="text/csv"
             )
-
 
 if __name__ == "__main__":
     main()

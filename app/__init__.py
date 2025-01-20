@@ -1,4 +1,3 @@
-# __init__.py
 from flask import Flask
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
@@ -10,23 +9,8 @@ app = Flask(__name__)
 model_path = os.path.join(os.path.dirname(__file__), 'model_lstm_compatible.h5')
 model = load_model(model_path)
 
-from . import routes
-
-# main.py
-from flask import request, jsonify
-import numpy as np
-from . import app, model
-import pickle
-import os
-
-# Charger le tokenizer
-tokenizer_path = os.path.join(os.path.dirname(__file__), 'tokenizer.pickle')
-with open(tokenizer_path, 'rb') as handle:
-    tokenizer = pickle.load(handle)
-
 # Paramètres du modèle
 MAX_SEQUENCE_LENGTH = 100  # Ajustez selon votre modèle
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -63,7 +47,6 @@ def predict():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
