@@ -1,1 +1,1 @@
-web: python app/main.py
+web: python app/download_nltk_data.py && python app/main.py

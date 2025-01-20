@@ -102,6 +102,12 @@ def feedbacknegatif():
 
     return jsonify({'status': 'Feedback enregistré'}), 200
 
+import os
+import subprocess
+
+# Download NLTK data
+subprocess.run(["python", "download_nltk_data.py"], check=True)
+
 import logging
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')

@@ -9,6 +9,7 @@ glove.6B.100d.txt
 glove.6B.100d.word2vec.txt
 local_app.py
 model_lstm.h5
+model_lstm_compatible.h5
 *.odt
 runtime.txt
 
