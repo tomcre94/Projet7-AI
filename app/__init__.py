@@ -18,23 +18,30 @@ def predict():
     try:
         from flask import request
 
+
         data = request.get_json()
+
 
         if not data or 'text' not in data:
             from flask import jsonify
 
+
             return jsonify({'error': 'Texte manquant dans la requête'}), 400
+
 
         # Prétraitement
         text = data['text']
         from app.download_nltk_data import tokenizer
 
+
         sequences = tokenizer.texts_to_sequences([text])
         padded_sequences = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
+
 
         # Prédiction
         prediction = model.predict(padded_sequences)
         sentiment_score = float(prediction[0][0])
+
 
         # Classification
         if sentiment_score >= 0.7:
@@ -46,14 +53,17 @@ def predict():
         else:
             sentiment = "Très négatif"
 
+
             return jsonify({
                 'text': text,
                 'sentiment': sentiment,
                 'score': sentiment_score
             })
 
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 
 

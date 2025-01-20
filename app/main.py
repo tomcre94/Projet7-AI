@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import tensorflow as tf
-import numpy as np
 import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -30,7 +29,6 @@ with open(tokenizer_path, 'rb') as handle:
 # Dictionnaire temporaire pour stocker la prédiction associée à un tweet
 prediction_cache = {}
 
-
 def clean_text(text):
     text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
     text = re.sub(r'\@\w+', 'mention', text)
@@ -43,26 +41,21 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
-
 @app.route('/')
 def home():
     return "API d'analyse de sentiments en ligne"
 
-
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-
         # Récupérer le texte de la requête
         data = request.get_json()
         if not data or 'text' not in data:
             return jsonify({'error': 'Aucun texte fourni'}), 400
 
-
         # Prétraitement du texte
         clean_tokens = clean_text(data['text'])
         text_cleaned = ' '.join(clean_tokens)
-
 
         # Tokenization avec padding
         sequences = tokenizer.texts_to_sequences([text_cleaned])
@@ -73,11 +66,9 @@ def predict():
             truncating='post'
         )
 
-
         # Prédiction
         prediction = model.predict(padded_seq)
         sentiment_score = float(prediction[0][0])
-
 
         # Classification du sentiment
         sentiment = "positif" if sentiment_score >= 0.5 else "négatif"
@@ -88,21 +79,17 @@ def predict():
             'score': sentiment_score,
             'processed_text': text_cleaned
         })
-
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/feedbackpositif', methods=['POST'])
 def feedbackpositif():
     return "true"
 
-
 @app.route('/feedbacknegatif', methods=['POST'])
 def feedbacknegatif():
     data = request.get_json()
     tweet_text = data.get('text', 'Texte inconnu')
-
 
     # Sauvegarde dans un fichier
     with open(os.path.join(BASE_DIR, 'feedback_negatif.txt'), 'a') as file:
@@ -110,13 +97,9 @@ def feedbacknegatif():
 
     return jsonify({'status': 'Feedback enregistré'}), 200
 
-
-import subprocess
-
-
 # Download NLTK data
+import subprocess
 subprocess.run(["python", "download_nltk_data.py"], check=True)
-
 
 import logging
 if __name__ != '__main__':
@@ -126,7 +109,6 @@ if __name__ != '__main__':
 
     # Download required NLTK data
     import nltk
-
     nltk.download('punkt')
     nltk.download('stopwords')
     nltk.download('wordnet')
