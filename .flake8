@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 120
+ignore = 
+    W293  # blank line contains whitespace
+    W292  # no newline at end of file
+    F401  # module imported but unused
+    E501  # line too long
+exclude = 
+    .git,
+    __pycache__,
+    myenv/*,
+    mlruns/*,
+    .github/*
