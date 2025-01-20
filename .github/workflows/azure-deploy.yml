@@ -20,7 +20,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsentencepiece-dev pkg-config
+          sudo apt-get install -y libsentencepiece-dev pkg-config protobuf-compiler
 
       - name: Set up Python
         uses: actions/setup-python@v2
