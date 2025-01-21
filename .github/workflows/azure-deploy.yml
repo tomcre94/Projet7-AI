@@ -37,6 +37,10 @@ jobs:
           pip install flake8
           flake8 app/
 
+      - name: Download NLTK data
+        run: |
+          python -m nltk.downloader punkt stopwords wordnet
+
       - name: Run tests
         run: |
           pytest
