@@ -2,7 +2,6 @@ transformers
 torch
 azure-identity
 azure-ai-ml
-flask==2.0.1
 tensorflow
 keras
 numpy
@@ -10,3 +9,5 @@ nltk==3.6.5
 gunicorn==20.1.0
 flask-cors==3.0.10
 pytest
+Flask==3.0.0
+Werkzeug==3.0.1
