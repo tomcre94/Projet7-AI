@@ -17,6 +17,8 @@ stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
+
+
 def clean_text(text):
     """
     Cleans input text by removing URLs, mentions, hashtags, non-alphabetic characters,
@@ -39,6 +41,8 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
+
+
 def load_dataframe(file_path):
     """
     Loads a DataFrame from a CSV file, ensuring proper handling of mixed data types.
@@ -59,6 +63,8 @@ def load_dataframe(file_path):
     except Exception as e:
         raise ValueError(f"Error loading DataFrame: {e}")
 
+
+
 def save_tokenizer(tokenizer, file_path):
     """
     Saves the tokenizer to a pickle file.
@@ -69,6 +75,8 @@ def save_tokenizer(tokenizer, file_path):
     """
     with open(file_path, 'wb') as handle:
         pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 
 def main():
     """
@@ -84,6 +92,7 @@ def main():
         save_tokenizer(tokenizer, 'tokenizer.pickle')
     except Exception as e:
         print(f"Error in main process: {e}")
+
 
 if __name__ == "__main__":
     main()
