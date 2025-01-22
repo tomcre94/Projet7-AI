@@ -7,7 +7,9 @@ import tensorflow as tf
 import pickle
 import pandas as pd
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Forcer l'utilisation du CPU
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Réduire les logs inutiles
+
 
 
 # Download necessary NLTK data
