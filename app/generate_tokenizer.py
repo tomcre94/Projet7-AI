@@ -17,7 +17,6 @@ stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
-
 def clean_text(text):
     """
     Cleans input text by removing URLs, mentions, hashtags, non-alphabetic characters,
@@ -40,11 +39,9 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
-
-# Load the DataFrame
 def load_dataframe(file_path):
     """
-    Loads a DataFrame from a CSV file.
+    Loads a DataFrame from a CSV file, ensuring proper handling of mixed data types.
 
     Args:
         file_path (str): The path to the CSV file.
@@ -52,8 +49,15 @@ def load_dataframe(file_path):
     Returns:
         pd.DataFrame: The loaded DataFrame.
     """
-    return pd.read_csv(file_path)
-
+    try:
+        df = pd.read_csv(file_path, low_memory=False)
+        if 'text' not in df.columns:
+            raise ValueError("The 'text' column is missing in the provided file.")
+        if not df['text'].apply(lambda x: isinstance(x, str)).all():
+            raise ValueError("Some values in the 'text' column are not strings.")
+        return df
+    except Exception as e:
+        raise ValueError(f"Error loading DataFrame: {e}")
 
 def save_tokenizer(tokenizer, file_path):
     """
@@ -66,20 +70,20 @@ def save_tokenizer(tokenizer, file_path):
     with open(file_path, 'wb') as handle:
         pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
-# Main script logic
 def main():
     """
     Main function to load data, clean text, fit a tokenizer, and save the tokenizer.
     """
-    df = load_dataframe('Dataset_Init.csv')
-    texts_for_training = df['text'].apply(clean_text).tolist()
+    try:
+        df = load_dataframe('Dataset_Init.csv')
+        texts_for_training = df['text'].apply(clean_text).tolist()
 
-    tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=5000, oov_token="<OOV>")
-    tokenizer.fit_on_texts(texts_for_training)
+        tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=5000, oov_token="<OOV>")
+        tokenizer.fit_on_texts(texts_for_training)
 
-    save_tokenizer(tokenizer, 'tokenizer.pickle')
-
+        save_tokenizer(tokenizer, 'tokenizer.pickle')
+    except Exception as e:
+        print(f"Error in main process: {e}")
 
 if __name__ == "__main__":
     main()
