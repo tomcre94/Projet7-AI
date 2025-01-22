@@ -6,6 +6,9 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 import tensorflow as tf
 import pickle
 import pandas as pd
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 
 # Download necessary NLTK data
 nltk.download('stopwords')
