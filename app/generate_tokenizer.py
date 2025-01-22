@@ -17,8 +17,18 @@ stop_words = set(stopwords.words('english'))
 stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
-# Define the text cleaning function
+
 def clean_text(text):
+    """
+    Cleans input text by removing URLs, mentions, hashtags, non-alphabetic characters,
+    and by applying stemming and lemmatization.
+
+    Args:
+        text (str): The text to clean.
+
+    Returns:
+        list: A list of cleaned and tokenized words.
+    """
     text = re.sub(r'http\S+|www\S+|https\S+', 'URL', text, flags=re.MULTILINE)
     text = re.sub(r'\@\w+', 'mention', text)
     text = re.sub(r'\#\w+', 'hashtag', text)
@@ -30,16 +40,46 @@ def clean_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
 
+
 # Load the DataFrame
-df = pd.read_csv('Dataset_Init.csv')
+def load_dataframe(file_path):
+    """
+    Loads a DataFrame from a CSV file.
 
-# Extract the 'text' column and clean the text data
-texts_for_training = df['text'].apply(clean_text).tolist()
+    Args:
+        file_path (str): The path to the CSV file.
 
-# Initialize and fit the tokenizer
-tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=5000, oov_token="<OOV>")
-tokenizer.fit_on_texts(texts_for_training)
+    Returns:
+        pd.DataFrame: The loaded DataFrame.
+    """
+    return pd.read_csv(file_path)
 
-# Save the tokenizer
-with open('tokenizer.pickle', 'wb') as handle:
-    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def save_tokenizer(tokenizer, file_path):
+    """
+    Saves the tokenizer to a pickle file.
+
+    Args:
+        tokenizer (tf.keras.preprocessing.text.Tokenizer): The tokenizer to save.
+        file_path (str): The path to the pickle file.
+    """
+    with open(file_path, 'wb') as handle:
+        pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+# Main script logic
+def main():
+    """
+    Main function to load data, clean text, fit a tokenizer, and save the tokenizer.
+    """
+    df = load_dataframe('Dataset_Init.csv')
+    texts_for_training = df['text'].apply(clean_text).tolist()
+
+    tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=5000, oov_token="<OOV>")
+    tokenizer.fit_on_texts(texts_for_training)
+
+    save_tokenizer(tokenizer, 'tokenizer.pickle')
+
+
+if __name__ == "__main__":
+    main()
