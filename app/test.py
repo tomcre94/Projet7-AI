@@ -1,7 +1,7 @@
 import requests
 
-url = 'http://127.0.0.1:5000/predict'
-payload = {'text': 'Je suis très content aujourd\'hui!'}
+url = 'https://projet7-deeplearning-e9hafvfabugpe0c3.francecentral-01.azurewebsites.net/predict'
+payload = {'text': 'I am very happy today!'}
 headers = {'Content-Type': 'application/json'}
 
 response = requests.post(url, json=payload, headers=headers)

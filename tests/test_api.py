@@ -52,7 +52,7 @@ class FlaskAPITestCase(unittest.TestCase):
         mock_tokenizer.return_value = self.tokenizer_mock
         mock_model.return_value = self.model_mock
         
-        payload = {'text': 'Je suis très content aujourd\'hui!'}
+        payload = {'text': 'I am very happy today!'}
         with timeout(5):  # Timeout de 5 secondes pour limiter le temps
             response = self.app.post(
                 '/predict',
